@@ -1,60 +1,70 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const bcrypt = require('bcrypt');
+const { sequelize } = require('../config/database'); // Importación correcta
 
+// Definir el modelo User
 const User = sequelize.define('User', {
-    user_id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
+  user_id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
     },
-    username: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    email: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-    },
-    password_hash: {
-        type: DataTypes.STRING,
-        allowNull: true,
-    },
-    user_role: {
-        type: DataTypes.ENUM('web', 'mobile', 'admin', 'editor'), // Specify the roles
-        allowNull: false,
-        defaultValue: 'web', // Default role is 'web'
-    },
-    created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
-    updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
+  },
+  password_hash: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  user_role: {
+    type: DataTypes.ENUM('admin', 'user'),
+  },
+  active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  full_name: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  first_lastname: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  second_lastname: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  id_card_number: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: false,
+  },
+  profile_picture_url: {
+    type: DataTypes.STRING,
+    allowNull: true, // Puede estar vacío si el usuario no subió una imagen
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  
 }, {
-    hooks: {
-        beforeCreate: async (user) => {
-            if (user.password_hash) {
-                const salt = await bcrypt.genSalt(10);
-                user.password_hash = await bcrypt.hash(user.password_hash, salt);
-            }
-        },
-        beforeUpdate: async (user) => {
-            if (user.password_hash) {
-                const salt = await bcrypt.genSalt(10);
-                user.password_hash = await bcrypt.hash(user.password_hash, salt);
-            }
-        }
-    },
-    timestamps: false,
+  timestamps: false,
 });
 
-User.prototype.validPassword = async function(password) {
-    return await bcrypt.compare(password, this.password_hash);
-};
-
+// Exportar el modelo User
 module.exports = User;

@@ -1,18 +1,33 @@
 require('dotenv').config();
-const pg = require('pg');
 const { Sequelize } = require('sequelize');
+const { pg } = require('pg');
+// Obtener la cadena de conexión desde las variables de entorno
+const connectionString = process.env.DATABASE_URL;
 
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
-    dialect: 'postgres',
-    dialectModule: pg
-  });
+// Crear una instancia de Sequelize usando la cadena de conexión
+const sequelize = new Sequelize(connectionString, {
+  dialect: 'postgres',
+  protocol: 'postgres',
+  logging: console.log,  // Cambiar a true si quieres ver las consultas SQL
+});
 
-sequelize.authenticate()
-    .then(() => {
-        console.log('Conexión establecida correctamente.');
-    })
-    .catch(err => {
-        console.error('No se pudo conectar a la base de datos:', err);
-    });
+// Función para conectar a la base de datos
+const connectDB = async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Conexión establecida correctamente a PostgreSQL.');
+    // Sincronizar los modelos con la base de datos
+    await sequelize.sync({ force: false });  // { force: true } para sobrescribir las tablas
+    //console.log('Tablas sincronizadas correctamente.');
+    
+  } catch (error) {
+    console.error('No se pudo conectar a la base de datos:', error.message);
+    process.exit(1);  // Terminar el proceso si no se puede conectar a la base de datos
+  }
+};
 
-module.exports = sequelize;
+// Exportar sequelize y la función connectDB
+module.exports = {
+  sequelize,
+  connectDB,
+};

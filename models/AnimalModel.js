@@ -1,37 +1,47 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const { sequelize } = require('../config/database');
+const AnchorPoint = require('./anchorPoint');
 
 const AnimalModel = sequelize.define('AnimalModel', {
-    model_id: {
-        type: DataTypes.UUID,
-        primaryKey: true,
-        defaultValue: DataTypes.UUIDV4,
-    },
-    model_name: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-    },
-    model_url: {
-        type: DataTypes.TEXT,
-        allowNull: false,
-        unique: true,
-    },
-    thumbnail_url: {
-        type: DataTypes.TEXT,
-    },
-    description: {
-        type: DataTypes.TEXT,
-    },
-    created_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
-    updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+  },
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  species: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
+  modelURL: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  icon: {
+    type: DataTypes.STRING, 
+    allowNull: true,
+  },
+  created_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+  },
 }, {
-    timestamps: false,
+  timestamps: false,
 });
 
 module.exports = AnimalModel;
